@@ -1,31 +1,28 @@
 package edu.sena.bibliotecaspring_2.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Column;
 
 @Entity
+@Table(name = "libro")
 public class Libro extends ElementoBiblioteca {
+
+    @Column(name = "isbn")
     private String isbn;
+
+    @Column(name = "numero_paginas")
     private int numeroPaginas;
+
+    @Column(name = "genero")
     private String genero;
+
+    @Column(name = "editorial")
     private String editorial;
 
-    @Transient
-    private String titulo;
-
-    @Transient
-    private String autor;
-
-    @Transient
-    private int anoPublicacion;
-
-    @Transient
-    private String tipo;
-
-    // Constructor vacío
+    // Constructores
     public Libro() {}
 
-    // Constructor con parámetros
     public Libro(String isbn, int numeroPaginas, String genero, String editorial, String titulo, String autor, int anoPublicacion) {
         super(titulo, autor, anoPublicacion);
         this.isbn = isbn;
@@ -34,16 +31,36 @@ public class Libro extends ElementoBiblioteca {
         this.editorial = editorial;
     }
 
-    // Getters y setters
-    public String getIsbn() { return isbn; }
-    public void setIsbn(String isbn) { this.isbn = isbn; }
+    // Getters y Setters
+    public String getIsbn() {
+        return isbn;
+    }
 
-    public int getNumeroPaginas() { return numeroPaginas; }
-    public void setNumeroPaginas(int numeroPaginas) { this.numeroPaginas = numeroPaginas; }
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
 
-    public String getGenero() { return genero; }
-    public void setGenero(String genero) { this.genero = genero; }
+    public int getNumeroPaginas() {
+        return numeroPaginas;
+    }
 
-    public String getEditorial() { return editorial; }
-    public void setEditorial(String editorial) { this.editorial = editorial; }
+    public void setNumeroPaginas(int numeroPaginas) {
+        this.numeroPaginas = numeroPaginas;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
+    }
+
+    public String getEditorial() {
+        return editorial;
+    }
+
+    public void setEditorial(String editorial) {
+        this.editorial = editorial;
+    }
 }

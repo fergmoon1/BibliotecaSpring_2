@@ -1,143 +1,119 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Elemento</title>
+    <title>Editar Elemento - Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
+            background-color: #f8f9fa;
         }
-        h1 {
-            text-align: center;
-            color: #333;
+        .container {
+            margin-top: 50px;
+            max-width: 600px;
         }
-        .nav-links {
-            text-align: center;
-            margin-bottom: 20px;
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .nav-links button {
-            padding: 8px 16px;
-            margin: 0 10px;
+        .btn-primary {
             background-color: #007bff;
-            color: white;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
-        .nav-links button:hover {
+        .btn-primary:hover {
             background-color: #0056b3;
         }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
+        .btn-secondary {
+            background-color: #6c757d;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
-        button:hover {
-            background-color: #218838;
-        }
-        .field-group {
-            display: none;
-        }
-        .field-group.active {
-            display: block;
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
 <body>
-<h1>Editar Elemento</h1>
-<div class="nav-links">
-    <button onclick="window.location.href='/biblioteca/'">Volver al Catálogo</button>
-    <button onclick="window.location.href='/biblioteca/ayuda'">Ayuda</button>
+<div class="container">
+    <div class="card p-4">
+        <h2 class="text-center mb-4">Editar Elemento</h2>
+        <form th:action="@{/biblioteca/actualizar}" method="post">
+            <input type="hidden" name="id" th:value="${elemento.id}" />
+            <input type="hidden" name="tipoElemento" th:value="${elemento.tipo}" />
+
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Título:</label>
+                <input type="text" name="titulo" th:value="${elemento.titulo}" class="form-control" id="titulo" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="autor" class="form-label">Autor:</label>
+                <input type="text" name="autor" th:value="${elemento.autor}" class="form-control" id="autor" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="anoPublicacion" class="form-label">Año de Publicación:</label>
+                <input type="number" name="anoPublicacion" th:value="${elemento.anoPublicacion}" class="form-control" id="anoPublicacion" required />
+            </div>
+
+            <!-- Campos específicos para Libro -->
+            <div th:if="${elemento.tipo == 'Libro'}">
+                <div class="mb-3">
+                    <label for="isbn" class="form-label">ISBN:</label>
+                    <input type="text" name="isbn" th:value="${elemento.isbn}" class="form-control" id="isbn" />
+                </div>
+                <div class="mb-3">
+                    <label for="numeroPaginas" class="form-label">Número de Páginas:</label>
+                    <input type="number" name="numeroPaginas" th:value="${elemento.numeroPaginas}" class="form-control" id="numeroPaginas" />
+                </div>
+                <div class="mb-3">
+                    <label for="generoLibro" class="form-label">Género:</label>
+                    <input type="text" name="genero" th:value="${elemento.genero}" class="form-control" id="generoLibro" />
+                </div>
+                <div class="mb-3">
+                    <label for="editorialLibro" class="form-label">Editorial:</label>
+                    <input type="text" name="editorial" th:value="${elemento.editorial}" class="form-control" id="editorialLibro" />
+                </div>
+            </div>
+
+            <!-- Campos específicos para Revista -->
+            <div th:if="${elemento.tipo == 'Revista'}">
+                <div class="mb-3">
+                    <label for="numeroEdicion" class="form-label">Número de Edición:</label>
+                    <input type="number" name="numeroEdicion" th:value="${elemento.numeroEdicion}" class="form-control" id="numeroEdicion" />
+                </div>
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">Categoría:</label>
+                    <input type="text" name="categoria" th:value="${elemento.categoria}" class="form-control" id="categoria" />
+                </div>
+                <div class="mb-3">
+                    <label for="editorialRevista" class="form-label">Editorial:</label>
+                    <input type="text" name="editorial" th:value="${elemento.editorial}" class="form-control" id="editorialRevista" />
+                </div>
+                <div class="mb-3">
+                    <label for="numero" class="form-label">Número:</label>
+                    <input type="number" name="numero" th:value="${elemento.numero}" class="form-control" id="numero" />
+                </div>
+            </div>
+
+            <!-- Campos específicos para DVD -->
+            <div th:if="${elemento.tipo == 'DVD'}">
+                <div class="mb-3">
+                    <label for="duracion" class="form-label">Duración (min):</label>
+                    <input type="number" name="duracion" th:value="${elemento.duracion}" class="form-control" id="duracion" />
+                </div>
+                <div class="mb-3">
+                    <label for="generoDVD" class="form-label">Género:</label>
+                    <input type="text" name="genero" th:value="${elemento.genero}" class="form-control" id="generoDVD" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <a th:href="@{/biblioteca/}" class="btn btn-secondary">Volver al Catálogo</a>
+            </div>
+        </form>
+    </div>
 </div>
-<div class="form-container">
-    <form th:action="@{/biblioteca/actualizar}" method="post">
-        <input type="hidden" name="id" th:value="${elemento.id}">
-        <input type="hidden" name="tipoElemento" th:value="${elemento.tipo.toLowerCase()}">
 
-        <label for="tipoElemento">Tipo de Elemento:</label>
-        <select name="tipoElementoDisabled" id="tipoElemento" disabled>
-            <option value="libro" th:selected="${elemento.tipo == 'Libro'}">Libro</option>
-            <option value="revista" th:selected="${elemento.tipo == 'Revista'}">Revista</option>
-            <option value="dvd" th:selected="${elemento.tipo == 'DVD'}">DVD</option>
-        </select>
-
-        <div id="camposComunes">
-            <label for="titulo">Título:</label>
-            <input type="text" name="titulo" id="titulo" th:value="${elemento.titulo}" required>
-
-            <label for="autor">Autor:</label>
-            <input type="text" name="autor" id="autor" th:value="${elemento.autor}" required>
-
-            <label for="anoPublicacion">Año de Publicación:</label>
-            <input type="number" name="anoPublicacion" id="anoPublicacion" th:value="${elemento.anoPublicacion}" required>
-        </div>
-
-        <div id="camposLibro" class="field-group" th:classappend="${elemento.tipo == 'Libro'} ? 'active' : ''">
-            <label for="isbn">ISBN:</label>
-            <input type="text" name="isbn" id="isbn" th:value="${elemento.isbn}">
-
-            <label for="numeroPaginas">Número de Páginas:</label>
-            <input type="number" name="numeroPaginas" id="numeroPaginas" th:value="${elemento.numeroPaginas}">
-
-            <label for="genero">Género:</label>
-            <input type="text" name="genero" id="genero" th:value="${elemento.genero}">
-
-            <label for="editorial">Editorial:</label>
-            <input type="text" name="editorial" id="editorial" th:value="${elemento.editorial}">
-        </div>
-
-        <div id="camposRevista" class="field-group" th:classappend="${elemento.tipo == 'Revista'} ? 'active' : ''">
-            <label for="numeroEdicion">Número de Edición:</label>
-            <input type="number" name="numeroEdicion" id="numeroEdicion" th:value="${elemento.numeroEdicion}">
-
-            <label for="categoria">Categoría:</label>
-            <input type="text" name="categoria" id="categoria" th:value="${elemento.categoria}">
-
-            <label for="editorialRevista">Editorial:</label>
-            <input type="text" name="editorial" id="editorialRevista" th:value="${elemento.editorial}">
-
-            <label for="numero">Número:</label>
-            <input type="number" name="numero" id="numero" th:value="${elemento.numero}">
-        </div>
-
-        <div id="camposDVD" class="field-group" th:classappend="${elemento.tipo == 'DVD'} ? 'active' : ''">
-            <label for="duracion">Duración (minutos):</label>
-            <input type="number" name="duracion" id="duracion" th:value="${elemento.duracion}">
-
-            <label for="generoDVD">Género:</label>
-            <input type="text" name="genero" id="generoDVD" th:value="${elemento.genero}">
-        </div>
-
-        <button type="submit">Actualizar</button>
-    </form>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

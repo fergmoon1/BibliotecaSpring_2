@@ -9,5 +9,4 @@ class BibliotecaSpring2ApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

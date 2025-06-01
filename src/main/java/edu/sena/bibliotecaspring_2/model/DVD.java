@@ -1,39 +1,42 @@
 package edu.sena.bibliotecaspring_2.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Column;
 
 @Entity
+@Table(name = "dvd")
 public class DVD extends ElementoBiblioteca {
+
+    @Column(name = "duracion")
     private int duracion;
+
+    @Column(name = "genero")
     private String genero;
 
-    @Transient
-    private String titulo;
-
-    @Transient
-    private String autor;
-
-    @Transient
-    private int anoPublicacion;
-
-    @Transient
-    private String tipo;
-
-    // Constructor vacío
+    // Constructores
     public DVD() {}
 
-    // Constructor con parámetros
     public DVD(int duracion, String genero, String titulo, String autor, int anoPublicacion) {
         super(titulo, autor, anoPublicacion);
         this.duracion = duracion;
         this.genero = genero;
     }
 
-    // Getters y setters
-    public int getDuracion() { return duracion; }
-    public void setDuracion(int duracion) { this.duracion = duracion; }
+    // Getters y Setters
+    public int getDuracion() {
+        return duracion;
+    }
 
-    public String getGenero() { return genero; }
-    public void setGenero(String genero) { this.genero = genero; }
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
+    }
 }

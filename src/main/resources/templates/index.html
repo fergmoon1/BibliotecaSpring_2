@@ -51,25 +51,29 @@
         }
         .message {
             position: fixed;
-            top: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
             z-index: 1000;
             display: none;
             animation: fadeOut 3s forwards;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
         }
         .error-message {
-            background-color: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
         }
         .success-message {
-            background-color: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
+        }
+        .message .icon {
+            margin-right: 10px;
+            font-size: 20px;
         }
         @keyframes fadeOut {
             0% { opacity: 1; }
@@ -123,13 +127,13 @@
             background-color: #6c757d; /* Gris */
         }
         .edit-button:hover {
-            background-color: #c6c8cc;
+            background-color: #5a6268;
         }
         .delete-button {
             background-color: #17a2b8; /* Azul claro */
         }
         .delete-button:hover {
-            background-color: #ce0e0e;
+            background-color: #138496;
         }
     </style>
 </head>
@@ -153,8 +157,14 @@
     </form>
 </div>
 
-<div th:if="${error}" class="message error-message" th:text="${error}"></div>
-<div th:if="${success}" class="message success-message" th:text="${success}"></div>
+<div th:if="${error}" class="message error-message">
+    <span class="icon">❌</span>
+    <span th:text="${error}"></span>
+</div>
+<div th:if="${success}" class="message success-message">
+    <span class="icon">✅</span>
+    <span th:text="${success}"></span>
+</div>
 
 <div class="tabs">
     <div class="tab" onclick="showTab('libros')">Libros</div>
@@ -162,7 +172,35 @@
     <div class="tab" onclick="showTab('dvds')">DVDs</div>
 </div>
 
-<div id="libros" class="tab-content">
+<div id="catalogo" class="tab-content">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Año de Publicación</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="elemento : ${elementos}">
+            <td th:text="${elemento.id}"></td>
+            <td th:text="${elemento.titulo}"></td>
+            <td th:text="${elemento.autor}"></td>
+            <td th:text="${elemento.anoPublicacion}"></td>
+            <td th:text="${elemento.tipo}"></td>
+            <td>
+                <button class="action-button edit-button" th:onclick="'window.location.href=\'/biblioteca/editar/' + ${elemento.id} + '\''">Editar</button>
+                <button class="action-button delete-button" th:onclick="'if(confirm(\'¿Está seguro de eliminar este elemento?\')){window.location.href=\'/biblioteca/eliminar/' + ${elemento.id} + '\'}'">Eliminar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="libros" class="tab-content" style="display: none;">
     <table>
         <thead>
         <tr>
@@ -279,10 +317,11 @@
     }
 
     window.onload = function() {
-        showTab('libros');
+        // Mostrar todos los elementos por defecto (catalogo)
+        document.getElementById('catalogo').style.display = 'block';
         const messages = document.querySelectorAll('.message');
         messages.forEach(msg => {
-            msg.style.display = 'block';
+            msg.style.display = 'flex';
             setTimeout(() => msg.style.display = 'none', 3000);
         });
     };
