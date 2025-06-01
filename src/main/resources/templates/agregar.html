@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Elemento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .field-group {
+            display: none;
+        }
+        .field-group.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>Agregar Elemento</h1>
+<div class="form-container">
+    <form th:action="@{/biblioteca/guardar}" method="post">
+        <label for="tipoElemento">Tipo de Elemento:</label>
+        <select name="tipoElemento" id="tipoElemento" onchange="showFields()">
+            <option value="libro">Libro</option>
+            <option value="revista">Revista</option>
+            <option value="dvd">DVD</option>
+        </select>
+
+        <div id="camposComunes">
+            <label for="titulo">Título:</label>
+            <input type="text" name="titulo" id="titulo" required>
+
+            <label for="autor">Autor:</label>
+            <input type="text" name="autor" id="autor" required>
+
+            <label for="anoPublicacion">Año de Publicación:</label>
+            <input type="number" name="anoPublicacion" id="anoPublicacion" required>
+        </div>
+
+        <div id="camposLibro" class="field-group active">
+            <label for="isbn">ISBN:</label>
+            <input type="text" name="isbn" id="isbn">
+
+            <label for="numeroPaginas">Número de Páginas:</label>
+            <input type="number" name="numeroPaginas" id="numeroPaginas">
+
+            <label for="genero">Género:</label>
+            <input type="text" name="genero" id="genero">
+
+            <label for="editorial">Editorial:</label>
+            <input type="text" name="editorial" id="editorial">
+        </div>
+
+        <div id="camposRevista" class="field-group">
+            <label for="numeroEdicion">Número de Edición:</label>
+            <input type="number" name="numeroEdicion" id="numeroEdicion">
+
+            <label for="categoria">Categoría:</label>
+            <input type="text" name="categoria" id="categoria">
+
+            <label for="editorialRevista">Editorial:</label>
+            <input type="text" name="editorial" id="editorialRevista">
+
+            <label for="numero">Número:</label>
+            <input type="number" name="numero" id="numero">
+        </div>
+
+        <div id="camposDVD" class="field-group">
+            <label for="duracion">Duración (minutos):</label>
+            <input type="number" name="duracion" id="duracion">
+
+            <label for="generoDVD">Género:</label>
+            <input type="text" name="genero" id="generoDVD">
+        </div>
+
+        <button type="submit">Guardar</button>
+    </form>
+</div>
+
+<script>
+    function showFields() {
+        var tipo = document.getElementById("tipoElemento").value;
+        document.querySelectorAll('.field-group').forEach(group => {
+            group.classList.remove('active');
+        });
+        document.getElementById('campos' + tipo.charAt(0).toUpperCase() + tipo.slice(1)).classList.add('active');
+    }
+</script>
+</body>
+</html>

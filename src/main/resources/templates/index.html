@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Biblioteca</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav-links button {
+            padding: 8px 16px;
+            margin: 0 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .nav-links button:hover {
+            background-color: #0056b3;
+        }
+        .search-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-form select, .search-form input[type="text"], .search-form button {
+            padding: 5px;
+            margin: 5px;
+        }
+        .search-form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+            animation: fadeOut 3s forwards;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #ddd;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .action-button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+        .edit-button {
+            background-color: #6c757d; /* Gris */
+        }
+        .edit-button:hover {
+            background-color: #c6c8cc;
+        }
+        .delete-button {
+            background-color: #17a2b8; /* Azul claro */
+        }
+        .delete-button:hover {
+            background-color: #ce0e0e;
+        }
+    </style>
+</head>
+<body>
+<h1>Catálogo de Biblioteca</h1>
+<div class="nav-links">
+    <button onclick="window.location.href='/biblioteca/'">Catálogo</button>
+    <button onclick="window.location.href='/biblioteca/agregar'">Agregar Elemento</button>
+    <button onclick="window.location.href='/biblioteca/ayuda'">Ayuda</button>
+</div>
+
+<div class="search-form">
+    <form th:action="@{/biblioteca/buscar}" method="post">
+        <select name="tipoBusqueda" id="tipoBusqueda">
+            <option value="titulo">Título</option>
+            <option value="autor">Autor</option>
+            <option value="genero">Género</option>
+        </select>
+        <input type="text" name="criterio" id="criterio" placeholder="Ingrese criterio de búsqueda" required>
+        <button type="submit">Buscar</button>
+    </form>
+</div>
+
+<div th:if="${error}" class="message error-message" th:text="${error}"></div>
+<div th:if="${success}" class="message success-message" th:text="${success}"></div>
+
+<div class="tabs">
+    <div class="tab" onclick="showTab('libros')">Libros</div>
+    <div class="tab" onclick="showTab('revistas')">Revistas</div>
+    <div class="tab" onclick="showTab('dvds')">DVDs</div>
+</div>
+
+<div id="libros" class="tab-content">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Año de Publicación</th>
+            <th>Tipo</th>
+            <th>ISBN</th>
+            <th>Número de Páginas</th>
+            <th>Género</th>
+            <th>Editorial</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="elemento : ${elementos}" th:if="${elemento.tipo == 'Libro'}">
+            <td th:text="${elemento.id}"></td>
+            <td th:text="${elemento.titulo}"></td>
+            <td th:text="${elemento.autor}"></td>
+            <td th:text="${elemento.anoPublicacion}"></td>
+            <td th:text="${elemento.tipo}"></td>
+            <td th:text="${elemento.isbn}"></td>
+            <td th:text="${elemento.numeroPaginas}"></td>
+            <td th:text="${elemento.genero}"></td>
+            <td th:text="${elemento.editorial}"></td>
+            <td>
+                <button class="action-button edit-button" th:onclick="'window.location.href=\'/biblioteca/editar/' + ${elemento.id} + '\''">Editar</button>
+                <button class="action-button delete-button" th:onclick="'if(confirm(\'¿Está seguro de eliminar este elemento?\')){window.location.href=\'/biblioteca/eliminar/' + ${elemento.id} + '\'}'">Eliminar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="revistas" class="tab-content" style="display: none;">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Año de Publicación</th>
+            <th>Tipo</th>
+            <th>Número de Edición</th>
+            <th>Categoría</th>
+            <th>Editorial</th>
+            <th>Número</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="elemento : ${elementos}" th:if="${elemento.tipo == 'Revista'}">
+            <td th:text="${elemento.id}"></td>
+            <td th:text="${elemento.titulo}"></td>
+            <td th:text="${elemento.autor}"></td>
+            <td th:text="${elemento.anoPublicacion}"></td>
+            <td th:text="${elemento.tipo}"></td>
+            <td th:text="${elemento.numeroEdicion}"></td>
+            <td th:text="${elemento.categoria}"></td>
+            <td th:text="${elemento.editorial}"></td>
+            <td th:text="${elemento.numero}"></td>
+            <td>
+                <button class="action-button edit-button" th:onclick="'window.location.href=\'/biblioteca/editar/' + ${elemento.id} + '\''">Editar</button>
+                <button class="action-button delete-button" th:onclick="'if(confirm(\'¿Está seguro de eliminar este elemento?\')){window.location.href=\'/biblioteca/eliminar/' + ${elemento.id} + '\'}'">Eliminar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="dvds" class="tab-content" style="display: none;">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Año de Publicación</th>
+            <th>Tipo</th>
+            <th>Duración</th>
+            <th>Género</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="elemento : ${elementos}" th:if="${elemento.tipo == 'DVD'}">
+            <td th:text="${elemento.id}"></td>
+            <td th:text="${elemento.titulo}"></td>
+            <td th:text="${elemento.autor}"></td>
+            <td th:text="${elemento.anoPublicacion}"></td>
+            <td th:text="${elemento.tipo}"></td>
+            <td th:text="${elemento.duracion}"></td>
+            <td th:text="${elemento.genero}"></td>
+            <td>
+                <button class="action-button edit-button" th:onclick="'window.location.href=\'/biblioteca/editar/' + ${elemento.id} + '\''">Editar</button>
+                <button class="action-button delete-button" th:onclick="'if(confirm(\'¿Está seguro de eliminar este elemento?\')){window.location.href=\'/biblioteca/eliminar/' + ${elemento.id} + '\'}'">Eliminar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(tabId).style.display = 'block';
+        document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+    }
+
+    window.onload = function() {
+        showTab('libros');
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(msg => {
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        });
+    };
+</script>
+</body>
+</html>
