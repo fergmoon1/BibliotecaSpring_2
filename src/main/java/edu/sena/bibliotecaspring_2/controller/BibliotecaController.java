@@ -6,13 +6,14 @@ import edu.sena.bibliotecaspring_2.model.Revista;
 import edu.sena.bibliotecaspring_2.model.DVD;
 import edu.sena.bibliotecaspring_2.service.ElementoBibliotecaService;
 import edu.sena.bibliotecaspring_2.util.BibliotecaException;
-import javax.persistence.PersistenceException; // Verifica que esta línea no esté marcada en rojo
+import javax.persistence.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -26,20 +27,34 @@ public class BibliotecaController {
     private static final Logger logger = LoggerFactory.getLogger(BibliotecaController.class);
 
     @GetMapping("/")
-    public String mostrarCatalogo(Model model) {
+    public String mostrarCatalogo(Model model, RedirectAttributes redirectAttributes) {
         logger.info("Intentando mostrar el catálogo...");
         try {
-            List<ElementoBiblioteca> elementos = elementoService.obtenerTodos();
-            logger.info("Elementos obtenidos: " + (elementos != null ? elementos.size() : "null"));
-            model.addAttribute("elementos", elementos);
-            model.addAttribute("error", null);
-            model.addAttribute("success", null);
+            // Verificar si hay elementos enviados como flash attribute desde /buscar
+            if (model.containsAttribute("elementos")) {
+                logger.info("Usando elementos de flash attribute");
+            } else {
+                List<ElementoBiblioteca> elementos = elementoService.obtenerTodos();
+                logger.info("Elementos obtenidos: " + (elementos != null ? elementos.size() : "null"));
+                model.addAttribute("elementos", elementos);
+            }
+            if (!model.containsAttribute("success")) {
+                model.addAttribute("success", null);
+            }
+            if (!model.containsAttribute("error")) {
+                model.addAttribute("error", null);
+            }
             return "index";
-        } catch (Exception e) {
+        } catch (BibliotecaException e) {
             logger.error("Error al mostrar catálogo: " + e.getMessage(), e);
             model.addAttribute("elementos", null);
-            model.addAttribute("error", "Error al mostrar el catálogo: " + e.getMessage());
+            model.addAttribute("error", e.getMessage());
             return "index";
+        } catch (Exception e) {
+            logger.error("Error inesperado al mostrar catálogo: " + e.getMessage(), e);
+            model.addAttribute("elementos", null);
+            model.addAttribute("error", "Error inesperado al mostrar el catálogo: " + e.getMessage());
+            return "redirect:/biblioteca/";
         }
     }
 
@@ -63,7 +78,7 @@ public class BibliotecaController {
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) Integer numero,
             @RequestParam(required = false) Integer duracion,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         logger.info("Intentando guardar elemento: " + titulo);
         try {
             ElementoBiblioteca elemento;
@@ -84,10 +99,10 @@ public class BibliotecaController {
                     throw new BibliotecaException("Tipo de elemento no válido");
             }
             elementoService.agregarElemento(elemento);
-            model.addAttribute("success", "Elemento agregado con éxito");
+            redirectAttributes.addFlashAttribute("success", "Elemento agregado con éxito");
         } catch (Exception e) {
             logger.error("Error al guardar elemento: " + e.getMessage(), e);
-            model.addAttribute("error", "Error al guardar el elemento: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al guardar el elemento: " + e.getMessage());
         }
         return "redirect:/biblioteca/";
     }
@@ -135,7 +150,7 @@ public class BibliotecaController {
             }
             model.addAttribute("elemento", elemento);
             return "editar";
-        } catch (PersistenceException e) { // Verifica que esta línea no esté marcada en rojo
+        } catch (PersistenceException e) {
             logger.error("Error de persistencia al intentar obtener el elemento con ID " + id + ": " + e.getMessage(), e);
             model.addAttribute("error", "Error de base de datos al cargar el elemento: " + e.getMessage());
             return "redirect:/biblioteca/";
@@ -161,7 +176,7 @@ public class BibliotecaController {
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) Integer numero,
             @RequestParam(required = false) Integer duracion,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         logger.info("Intentando actualizar elemento con ID: " + id);
         try {
             ElementoBiblioteca elemento;
@@ -183,29 +198,29 @@ public class BibliotecaController {
             }
             elemento.setId(id);
             elementoService.actualizarElemento(elemento);
-            model.addAttribute("success", "Elemento actualizado con éxito");
+            redirectAttributes.addFlashAttribute("success", "Elemento actualizado con éxito");
         } catch (Exception e) {
             logger.error("Error al actualizar elemento: " + e.getMessage(), e);
-            model.addAttribute("error", "Error al actualizar el elemento: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar el elemento: " + e.getMessage());
         }
         return "redirect:/biblioteca/";
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminarElemento(@PathVariable("id") int id, Model model) {
+    public String eliminarElemento(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         logger.info("Intentando eliminar elemento con ID: " + id);
         try {
             elementoService.eliminarElemento(id);
-            model.addAttribute("success", "Elemento eliminado con éxito");
+            redirectAttributes.addFlashAttribute("success", "Elemento eliminado con éxito");
         } catch (Exception e) {
             logger.error("Error al eliminar elemento: " + e.getMessage(), e);
-            model.addAttribute("error", "Error al eliminar el elemento: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al eliminar el elemento: " + e.getMessage());
         }
         return "redirect:/biblioteca/";
     }
 
     @PostMapping("/buscar")
-    public String buscarElementos(@RequestParam String criterio, @RequestParam String tipoBusqueda, Model model) {
+    public String buscarElementos(@RequestParam String criterio, @RequestParam String tipoBusqueda, RedirectAttributes redirectAttributes) {
         logger.info("Iniciando búsqueda - Criterio: " + criterio + ", Tipo de búsqueda: " + tipoBusqueda);
         try {
             List<ElementoBiblioteca> resultados;
@@ -223,15 +238,29 @@ public class BibliotecaController {
                     throw new BibliotecaException("Tipo de búsqueda no válido");
             }
             logger.info("Resultados encontrados: " + (resultados != null ? resultados.size() : "null"));
-            model.addAttribute("elementos", resultados);
-            model.addAttribute("error", null);
-            model.addAttribute("success", null);
-            return "index";
+            redirectAttributes.addFlashAttribute("elementos", resultados);
+            // No establecer mensaje de éxito para que el modal no aparezca
+            return "redirect:/biblioteca/";
+        } catch (BibliotecaException e) {
+            logger.info("Búsqueda sin resultados: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            try {
+                redirectAttributes.addFlashAttribute("elementos", elementoService.obtenerTodos());
+            } catch (BibliotecaException ex) {
+                logger.info("No se pudieron cargar todos los elementos: " + ex.getMessage());
+                redirectAttributes.addFlashAttribute("elementos", null);
+            }
+            return "redirect:/biblioteca/";
         } catch (Exception e) {
-            logger.error("Error al buscar elementos | Causa: " + e.getMessage(), e);
-            model.addAttribute("elementos", null);
-            model.addAttribute("error", "Error al buscar elementos: " + e.getMessage());
-            return "index";
+            logger.error("Error inesperado al buscar elementos: " + e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Error inesperado al buscar elementos: " + e.getMessage());
+            try {
+                redirectAttributes.addFlashAttribute("elementos", elementoService.obtenerTodos());
+            } catch (BibliotecaException ex) {
+                logger.info("No se pudieron cargar todos los elementos: " + ex.getMessage());
+                redirectAttributes.addFlashAttribute("elementos", null);
+            }
+            return "redirect:/biblioteca/";
         }
     }
 

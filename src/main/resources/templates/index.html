@@ -133,7 +133,43 @@
             background-color: #17a2b8; /* Azul claro */
         }
         .delete-button:hover {
-            background-color: #138496;
+            background-color: #ce0e0e;
+        }
+        /* Estilos para los modales */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            font-size: 16px;
+            flex-direction: column;
+            align-items: center;
+        }
+        .modal-content {
+            display: flex;
+            align-items: center;
+        }
+        .modal-content .icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .modal-close {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -157,13 +193,20 @@
     </form>
 </div>
 
-<div th:if="${error}" class="message error-message">
-    <span class="icon">❌</span>
-    <span th:text="${error}"></span>
+<!-- Modales para éxito y error -->
+<div id="successModal" class="modal success-message">
+    <div class="modal-content">
+        <span class="icon">✅</span>
+        <span th:text="${success}"></span>
+    </div>
+    <button class="modal-close" onclick="closeModal('successModal')">Cerrar</button>
 </div>
-<div th:if="${success}" class="message success-message">
-    <span class="icon">✅</span>
-    <span th:text="${success}"></span>
+<div id="errorModal" class="modal error-message">
+    <div class="modal-content">
+        <span class="icon">❌</span>
+        <span th:text="${error}"></span>
+    </div>
+    <button class="modal-close" onclick="closeModal('errorModal')">Cerrar</button>
 </div>
 
 <div class="tabs">
@@ -316,14 +359,61 @@
         document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
     }
 
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
     window.onload = function() {
-        // Mostrar todos los elementos por defecto (catalogo)
+        console.log("Página cargada");
         document.getElementById('catalogo').style.display = 'block';
-        const messages = document.querySelectorAll('.message');
-        messages.forEach(msg => {
-            msg.style.display = 'flex';
-            setTimeout(() => msg.style.display = 'none', 3000);
-        });
+
+        const successModal = document.getElementById('successModal');
+        const errorModal = document.getElementById('errorModal');
+
+        // Depuración: Verificar si los modales existen
+        console.log("successModal:", successModal);
+        console.log("errorModal:", errorModal);
+
+        // Inicializar textos como vacíos
+        let successText = '';
+        let errorText = '';
+
+        // Obtener el contenido del modal de éxito
+        if (successModal) {
+            const successContent = successModal.querySelector('.modal-content span:nth-child(2)');
+            console.log("successContent:", successContent);
+            if (successContent) {
+                successText = successContent.textContent.trim();
+            }
+        }
+
+        // Obtener el contenido del modal de error
+        if (errorModal) {
+            const errorContent = errorModal.querySelector('.modal-content span:nth-child(2)');
+            console.log("errorContent:", errorContent);
+            if (errorContent) {
+                errorText = errorContent.textContent.trim();
+            }
+        }
+
+        console.log("Success recibido:", successText);
+        console.log("Error recibido:", errorText);
+
+        // Mostrar el modal de éxito si hay mensaje
+        if (successText && successText !== 'null') {
+            console.log("Mostrando modal de éxito: " + successText);
+            successModal.style.display = 'flex';
+        } else {
+            console.log("No hay texto de éxito o el modal no tiene contenido.");
+        }
+
+        // Mostrar el modal de error si hay mensaje
+        if (errorText && errorText !== 'null') {
+            console.log("Mostrando modal de error: " + errorText);
+            errorModal.style.display = 'flex';
+        } else {
+            console.log("No hay texto de error o el modal no tiene contenido.");
+        }
     };
 </script>
 </body>
